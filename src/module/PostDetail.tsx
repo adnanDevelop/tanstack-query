@@ -1,18 +1,15 @@
-import { fetchData } from "@/axios/axio";
+import { Link, useParams } from "react-router-dom";
+import { getDataById } from "@/axios/axio";
 import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
-import { NavLink } from "react-router-dom";
 
-const Home = () => {
+const PostDetail = () => {
+  const { id } = useParams();
+
   const { isLoading, data, isError, error } = useQuery({
     queryKey: ["posts"],
-    queryFn: fetchData,
-    // staleTime: 5000,
-    refetchInterval: 1000,
-    // refetchIntervalInBackground: true,
+    queryFn: () => getDataById(Number(id)),
   });
-
-  console.log(data, "home data");
 
   if (isError)
     return (
@@ -23,18 +20,9 @@ const Home = () => {
 
   return (
     <div className="px-[20px] pt-[100px] w-[900px] mx-auto ">
-      <ul className="grid grid-cols-2 gap-4">
+      <ul>
         {isLoading ? (
-          <>
-            {[1, 2, 3, 4, 5].map((element) => {
-              return (
-                <Skeleton
-                  key={element}
-                  className="h-[100px] rounded-xl bg-[#182232] mb-3"
-                />
-              );
-            })}
-          </>
+          <Skeleton className="h-[100px] rounded-xl bg-[#182232] mb-3" />
         ) : (
           data?.map(
             (
@@ -49,12 +37,16 @@ const Home = () => {
                   <span className="text-lg text-white w-[40px] h-[40px] rounded-md bg-green-500 flex items-center justify-center">
                     {element?.id}
                   </span>
-                  <NavLink to={`/fetchData/${element?.id}`}>
-                    <h2 className="text-2xl font-medium">{element?.title}</h2>
-                    <p className="mt-2 text-base text-justify text-slate-300">
-                      {element?.body}
-                    </p>
-                  </NavLink>
+                  <h2 className="text-2xl font-medium">{element?.title}</h2>
+                  <p className="mt-2 text-base text-justify text-slate-300">
+                    {element?.body}
+                  </p>
+                  <Link
+                    to="/"
+                    className="h-[30px] leading-[25px] text-sm  mt-4 inline-block px-[20px] text-center text-white bg-green-500 rounded-md"
+                  >
+                    Go Back
+                  </Link>
                 </li>
               );
             }
@@ -65,4 +57,4 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default PostDetail;
