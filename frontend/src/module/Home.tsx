@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { NavLink } from "react-router-dom";
 
 // Components
@@ -9,20 +10,44 @@ import {
   PaginationPrevious,
   PaginationLink,
 } from "@/components/ui/pagination";
-import { fetchData } from "@/axios/axio";
-import { useQuery } from "@tanstack/react-query";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
 import { Skeleton } from "@/components/ui/skeleton";
-import { useState } from "react";
+import { deleteCard, fetchData } from "@/axios/axio";
+import {
+  keepPreviousData,
+  useQueryClient,
+  useMutation,
+  useQuery,
+} from "@tanstack/react-query";
 
 const Home = () => {
   const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+  const queryClient = useQueryClient();
 
   const { isLoading, data, isError, error } = useQuery({
-    queryKey: ["posts", page],
-    queryFn: () => fetchData(page),
+    queryKey: ["posts", page, limit],
+    queryFn: () => fetchData(page, limit),
     // staleTime: 5000,
-    // refetchInterval: 1000,
+    // refetchInterval: 500,
     // refetchIntervalInBackground: true,
+    placeholderData: keepPreviousData,
+  });
+
+  const deleteMutation = useMutation({
+    mutationKey: ["posts"],
+    mutationFn: (deleteId: string) => deleteCard(deleteId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["posts"] });
+    },
   });
 
   if (isError)
@@ -47,9 +72,14 @@ const Home = () => {
             })}
           </>
         ) : (
-          data?.map(
+          data?.data?.map(
             (
-              element: { title: string; body: string; id: string },
+              element: {
+                title: string;
+                body: string;
+                it: string;
+                _id: string;
+              },
               index: number
             ) => {
               return (
@@ -58,42 +88,66 @@ const Home = () => {
                   className="p-[30px] bg-[#182232] text-white mb-3 rounded-md border-l-[3px] border-l-green-500"
                 >
                   <span className="text-lg text-white w-[40px] h-[40px] rounded-md bg-green-500 flex items-center justify-center">
-                    {element?.id}
+                    {element?.it}
                   </span>
-                  <NavLink to={`/fetchData/${element?.id}`}>
+                  <NavLink to={`/fetchData/${element?._id}`}>
                     <h2 className="text-2xl font-medium">{element?.title}</h2>
                     <p className="mt-2 text-base text-justify text-slate-300">
                       {element?.body}
                     </p>
                   </NavLink>
+                  <button
+                    onClick={() => deleteMutation.mutate(element?._id)}
+                    className="h-[30px] leading-[25px] text-sm  mt-4 inline-block px-[20px] text-center text-white bg-red-500 rounded-md"
+                  >
+                    Delete
+                  </button>
                 </li>
               );
             }
           )
         )}
       </ul>
-      <div className="py-[40px]">
-        <Pagination>
-          <PaginationContent>
-            <PaginationItem>
-              <PaginationPrevious
-                onClick={() => setPage((page) => (page > 1 ? page - 1 : 1))}
-                className="select-none"
-              />
-            </PaginationItem>
-            <PaginationItem>
-              <PaginationLink className="text-white cursor-pointer focus:bg-green-500 hover:bg-green-500 hover:text-white">
-                {page}
-              </PaginationLink>
-            </PaginationItem>
-            <PaginationItem>
-              <PaginationNext
-                onClick={() => setPage((page) => page + 1)}
-                className="select-none"
-              />
-            </PaginationItem>
-          </PaginationContent>
-        </Pagination>
+      <div className="py-[40px] flex items-center justify-between">
+        <div>
+          <Select onValueChange={(value) => setLimit(parseInt(value))}>
+            <SelectTrigger className="w-[60px] px-2 border-white text-white">
+              <SelectValue placeholder="10" />
+            </SelectTrigger>
+            <SelectContent className="bg-[#182232] text-white border-green-500">
+              <SelectGroup>
+                <SelectItem value="10">10</SelectItem>
+                <SelectItem value="25">25</SelectItem>
+                <SelectItem value="50">50</SelectItem>
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+        </div>
+        <div>
+          <Pagination>
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious
+                  onClick={() => setPage((page) => (page > 1 ? page - 1 : 1))}
+                  className="select-none"
+                />
+              </PaginationItem>
+              <PaginationItem>
+                <PaginationLink className="text-white cursor-pointer focus:bg-green-500 hover:bg-green-500 hover:text-white">
+                  {page}
+                </PaginationLink>
+              </PaginationItem>
+              <PaginationItem>
+                <PaginationNext
+                  onClick={() => {
+                    if (page < data?.pages) setPage((page) => page + 1);
+                  }}
+                  className="select-none"
+                />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
+        </div>
       </div>
     </div>
   );

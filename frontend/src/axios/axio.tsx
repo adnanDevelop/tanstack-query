@@ -1,17 +1,33 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "https://jsonplaceholder.typicode.com",
+  // baseURL: "https://jsonplaceholder.typicode.com",
+  baseURL: "http://localhost:3000",
 });
 
-export const fetchData = async (page: number) => {
-  const response = await api.get(`/posts?_limit=4&_start=${page}`);
+export const fetchData = async (
+  page: number,
+  limit: number
+  // search: string
+) => {
+  // const response = await api.get(`/posts?_limit=4&_start=${page}`);
+  // `/api/data?page=${page}&limit=${limit}&search=${search}`
+  const response = await api.get(`/api/data?page=${page}&limit=${limit}`);
   return response.status === 200 ? response?.data : [];
 };
 
 export const getDataById = async (id: number) => {
-  const response = await api.get(`/posts?id=${id}`);
+  const response = await axios.get(`http://localhost:3000/api/data/${id}`);
   return response.status === 200 ? response?.data : [];
+};
+
+export const deleteCard = async (id: string) => {
+  const response = await axios.delete(
+    `http://localhost:3000/api/data/delete/${id}`
+  );
+  return response.status === 200
+    ? "Card deleted successfully "
+    : "Error while deleting card";
 };
 
 {

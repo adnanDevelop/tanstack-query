@@ -52,6 +52,28 @@ app.get("/api/data", async (req, res) => {
   }
 });
 
+app.get("/api/data/:id", async (req, res) => {
+  const { id } = req.params;
+  try {
+    const result = await Dummy.findById(id);
+
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.delete("/api/data/delete/:id", async (req, res) => {
+  const { id } = req.params;
+  const result = await Dummy.findByIdAndDelete(id);
+
+  if (result) {
+    res.json({ message: "Data deleted successfully" });
+  } else {
+    res.status(404).json({ message: "Data not found" });
+  }
+});
+
 // Start the Server
 const PORT = 3000;
 app.listen(PORT, () =>
