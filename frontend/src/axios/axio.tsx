@@ -30,6 +30,19 @@ export const deleteCard = async (id: string) => {
     : "Error while deleting card";
 };
 
+export const updateCard = async (
+  id: string,
+  data: { title: string; body: string }
+) => {
+  const response = await axios.put(
+    `http://localhost:3000/api/data/update/${id}`,
+    data
+  );
+  return response.status === 200
+    ? "Card updated successfully "
+    : "Error while updating card";
+};
+
 {
   /*
   

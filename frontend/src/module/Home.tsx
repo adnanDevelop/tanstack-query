@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { NavLink } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 
 // Components
 import {
@@ -96,12 +96,20 @@ const Home = () => {
                       {element?.body}
                     </p>
                   </NavLink>
-                  <button
-                    onClick={() => deleteMutation.mutate(element?._id)}
-                    className="h-[30px] leading-[25px] text-sm  mt-4 inline-block px-[20px] text-center text-white bg-red-500 rounded-md"
-                  >
-                    Delete
-                  </button>
+                  <div className="flex items-center gap-3">
+                    <button
+                      onClick={() => deleteMutation.mutate(element?._id)}
+                      className="h-[30px] leading-[25px] text-sm  mt-4 inline-block px-[20px] text-center text-white bg-red-500 rounded-md"
+                    >
+                      Delete
+                    </button>
+                    <Link
+                      to={`/updateData/${element?._id}`}
+                      className="h-[30px] leading-[25px] text-sm  mt-4 inline-block px-[20px] text-center text-white bg-green-500 rounded-md"
+                    >
+                      Update
+                    </Link>
+                  </div>
                 </li>
               );
             }

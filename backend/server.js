@@ -74,6 +74,23 @@ app.delete("/api/data/delete/:id", async (req, res) => {
   }
 });
 
+app.put("/api/data/update/:id", async (req, res) => {
+  const { id } = req.params;
+  const { title, body } = req.body;
+
+  const result = await Dummy.findByIdAndUpdate(
+    id,
+    { title, body },
+    { new: true }
+  );
+
+  if (result) {
+    res.json({ message: "Data updated successfully", data: result });
+  } else {
+    res.status(404).json({ message: "Data not found" });
+  }
+});
+
 // Start the Server
 const PORT = 3000;
 app.listen(PORT, () =>
