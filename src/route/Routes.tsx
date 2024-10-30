@@ -13,6 +13,7 @@ export const Routes = () => {
       children: [
         { path: "/", index: true, element: <Home /> },
         { path: "fetchData", element: <FetchData /> },
+        // { path: "fetchRQ", element: <FetchData /> },
       ],
     },
   ]);

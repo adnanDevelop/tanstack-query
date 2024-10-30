@@ -6,6 +6,7 @@ const Home = () => {
   const { isLoading, data, isError, error } = useQuery({
     queryKey: ["posts"],
     queryFn: fetchData,
+    // staleTime: 5000,
   });
 
   if (isError)
